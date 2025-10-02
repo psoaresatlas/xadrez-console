@@ -26,8 +26,13 @@ namespace xadrez_console
 
             Console.WriteLine($"Exemplo: {rei} {rainha} {torre} {bispo} {cavalo} {peao}");
 
+            Console.WriteLine();
+
             Tabuleiro tab = new Tabuleiro (8,8);
 
+            Tela.imprimirTabuleiro(tab);
+
+            Console.ReadLine();
         }
     }
 }
