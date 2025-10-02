@@ -1,8 +1,8 @@
 ﻿using tabuleiro;
 
-namespace xadrez_console.tabuleiro
+namespace tabuleiro
 {
-    internal class Peca
+    class Peca
     {
 
         public Posicao posicao {  get; set; }
@@ -10,9 +10,9 @@ namespace xadrez_console.tabuleiro
         public int qtdMovimentos { get; set; }
         public Tabuleiro tab {  get; set; }
 
-        public Peca(Posicao posicao, Cor cor, Tabuleiro tab)
+        public Peca(Tabuleiro tab, Cor cor)
         {
-            this.posicao = posicao;
+            this.posicao = null;
             this.cor = cor;
             this.qtdMovimentos = 0;
             this.tab = tab;
