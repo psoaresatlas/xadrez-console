@@ -2,7 +2,7 @@
 
 namespace xadrez
 {
-    static class Config
+    static class ConfigSimbolos
     {
         public static bool UsarSimbolos { get; set; } = false;
     }

@@ -2,22 +2,22 @@
 
 namespace xadrez
 {
-    class Rei : Peca
+    class Cavalo : Peca
     {
-        public Rei(Tabuleiro tab, Cor cor)
-            :base(tab, cor)
+        public Cavalo(Tabuleiro tab, Cor cor)
+            : base(tab, cor)
         {
 
         }
-         public override string ToString()
+        public override string ToString()
         {
             if (ConfigSimbolos.UsarSimbolos)
             {
-                return "♔";
+                return "♘";
             }
             else
             {
-                return "K";
+                return "N";
             }
         }
 
