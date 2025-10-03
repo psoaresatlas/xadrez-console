@@ -67,6 +67,7 @@ namespace xadrez_console
                 tab.colocarPeca(new Peao(tab, Cor.Preta), new Posicao(1, 6));
                 tab.colocarPeca(new Peao(tab, Cor.Preta), new Posicao(1, 7));
 
+                
                 Tela.imprimirTabuleiro(tab);
             }
             catch (TabuleiroException e)
