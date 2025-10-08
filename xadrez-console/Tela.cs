@@ -51,11 +51,34 @@ namespace xadrez_console
 
         public static PosicaoXadrez lerPosicaoXadrez()
         {
-            string s = Console.ReadLine();
+            string s = Console.ReadLine()?.Trim().ToLower();
+
+            if (string.IsNullOrEmpty(s) || s.Length < 2)
+            {
+                throw new FormatException("Use o formato 'a1' (coluna + linha).");
+            }
+
             char coluna = s[0];
-            int linha = int.Parse(s[1] + "");
+
+            if (coluna < 'a' || coluna > 'h')
+            {
+                throw new FormatException("Coluna inválida. Use letras entre 'a' e 'h'.");
+            }
+
+            string resto = s.Substring(1);
+            if (!int.TryParse(resto, out int linha))
+            {
+                throw new FormatException("Linha inválida. Use números entre 1 e 8.");
+            }
+
+            if (linha < 1 || linha > 8)
+            {
+                throw new FormatException("Linha inválida. Use números entre 1 e 8.");
+            }
+
             return new PosicaoXadrez(coluna, linha);
         }
+
 
         public static void imprimirPeca(Peca peca)
         {

@@ -19,19 +19,39 @@ namespace xadrez
             colocarPecas();
         }
 
-        public void executaMovimento(Posicao origem, Posicao destino)
+        public Peca executaMovimento(Posicao origem, Posicao destino)
         {
             Peca p = tab.retirarPeca(origem);
             p.incrementarQtdeMovimentos();
             Peca pecaCapturada = tab.retirarPeca(destino);
             tab.colocarPeca(p, destino);
+            return pecaCapturada;
+        }
+
+        public void desfazMovimento(Posicao origem, Posicao destino, Peca pecaCapturada)
+        {
+            Peca p = tab.retirarPeca(destino);
+            p.qtdMovimentos--;
+            if (pecaCapturada != null)
+            {
+                tab.colocarPeca(pecaCapturada, destino);
+            }
+            tab.colocarPeca(p, origem);
         }
 
         public void realizaJogada(Posicao origem, Posicao destino)
         {
-            executaMovimento(origem, destino);
+            Peca pecaCapturada = executaMovimento(origem, destino);
+
+            if (reiEmXeque(jogadorAtual))
+            {
+                desfazMovimento(origem, destino, pecaCapturada);
+                throw new TabuleiroException("Você não pode se colocar em xeque!");
+            }
+
             turno++;
             mudaJogador();
+
         }
 
         public void validarPosicaoOrigem(Posicao pos)
@@ -48,7 +68,56 @@ namespace xadrez
             {
                 throw new TabuleiroException("Não existe possibilidade de movimento para essa peça");
             }
+        }
 
+        public void validarPosicaoDestino(Posicao origem, Posicao destino)
+        {
+            if (!tab.peca(origem).movimentosPossiveis()[destino.linha, destino.coluna])
+            {
+                throw new TabuleiroException("Posição de destino inválida!");
+            }
+        }
+
+        public bool reiEmXeque(Cor cor)
+        {
+            Posicao posRei = encontrarRei(cor);
+            if (posRei == null)
+            {
+                throw new TabuleiroException("Não foi possível encontrar o rei da cor " + cor);
+            }
+
+            for (int i = 0; i < tab.linhas; i++)
+            {
+                for (int j = 0; j < tab.colunas; j++)
+                {
+                    Peca p = tab.peca(i, j);
+                    if (p != null && p.cor != cor)
+                    {
+                        bool[,] mat = p.movimentosPossiveis();
+                        if (mat[posRei.linha, posRei.coluna])
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        private Posicao encontrarRei(Cor cor)
+        {
+            for (int i = 0; i < tab.linhas; i++)
+            {
+                for (int j = 0; j < tab.colunas; j++)
+                {
+                    Peca p = tab.peca(i, j);
+                    if (p != null && p is Rei && p.cor == cor)
+                    {
+                        return new Posicao(i, j);
+                    }
+                }
+            }
+            return null;
         }
 
         private void mudaJogador()
@@ -62,43 +131,16 @@ namespace xadrez
                 jogadorAtual = Cor.Branca;
             }
         }
+
         private void colocarPecas()
         {
             tab.colocarPeca(new Torre(tab, Cor.Branca), new PosicaoXadrez('a', 1).conversorPosicao());
             tab.colocarPeca(new Torre(tab, Cor.Branca), new PosicaoXadrez('h', 1).conversorPosicao());
-            //tab.colocarPeca(new Cavalo(tab, Cor.Branca), new PosicaoXadrez('b', 1).conversorPosicao());
-            //tab.colocarPeca(new Cavalo(tab, Cor.Branca), new PosicaoXadrez('g', 1).conversorPosicao());
-            //tab.colocarPeca(new Bispo(tab, Cor.Branca), new PosicaoXadrez('c', 1).conversorPosicao());
-            //tab.colocarPeca(new Bispo(tab, Cor.Branca), new PosicaoXadrez('f', 1).conversorPosicao());
-            //tab.colocarPeca(new Rainha(tab, Cor.Branca), new PosicaoXadrez('d', 1).conversorPosicao());
             tab.colocarPeca(new Rei(tab, Cor.Branca), new PosicaoXadrez('e', 1).conversorPosicao());
-            //tab.colocarPeca(new Peao(tab, Cor.Branca), new PosicaoXadrez('a', 2).conversorPosicao());
-            //tab.colocarPeca(new Peao(tab, Cor.Branca), new PosicaoXadrez('b', 2).conversorPosicao());
-            //tab.colocarPeca(new Peao(tab, Cor.Branca), new PosicaoXadrez('c', 2).conversorPosicao());
-            //tab.colocarPeca(new Peao(tab, Cor.Branca), new PosicaoXadrez('d', 2).conversorPosicao());
-            //tab.colocarPeca(new Peao(tab, Cor.Branca), new PosicaoXadrez('e', 2).conversorPosicao());
-            //tab.colocarPeca(new Peao(tab, Cor.Branca), new PosicaoXadrez('f', 2).conversorPosicao());
-            //tab.colocarPeca(new Peao(tab, Cor.Branca), new PosicaoXadrez('g', 2).conversorPosicao());
-            //tab.colocarPeca(new Peao(tab, Cor.Branca), new PosicaoXadrez('h', 2).conversorPosicao());
 
             tab.colocarPeca(new Torre(tab, Cor.Preta), new PosicaoXadrez('a', 8).conversorPosicao());
             tab.colocarPeca(new Torre(tab, Cor.Preta), new PosicaoXadrez('h', 8).conversorPosicao());
-            //tab.colocarPeca(new Cavalo(tab, Cor.Preta), new PosicaoXadrez('b', 8).conversorPosicao());
-            //tab.colocarPeca(new Cavalo(tab, Cor.Preta), new PosicaoXadrez('g', 8).conversorPosicao());
-            //tab.colocarPeca(new Bispo(tab, Cor.Preta), new PosicaoXadrez('c', 8).conversorPosicao());
-            //tab.colocarPeca(new Bispo(tab, Cor.Preta), new PosicaoXadrez('f', 8).conversorPosicao());
-            //tab.colocarPeca(new Rainha(tab, Cor.Preta), new PosicaoXadrez('d', 8).conversorPosicao());
             tab.colocarPeca(new Rei(tab, Cor.Preta), new PosicaoXadrez('e', 8).conversorPosicao());
-            //tab.colocarPeca(new Peao(tab, Cor.Preta), new PosicaoXadrez('a', 7).conversorPosicao());
-            //tab.colocarPeca(new Peao(tab, Cor.Preta), new PosicaoXadrez('b', 7).conversorPosicao());
-            //tab.colocarPeca(new Peao(tab, Cor.Preta), new PosicaoXadrez('c', 7).conversorPosicao());
-            //tab.colocarPeca(new Peao(tab, Cor.Preta), new PosicaoXadrez('d', 7).conversorPosicao());
-            //tab.colocarPeca(new Peao(tab, Cor.Preta), new PosicaoXadrez('e', 7).conversorPosicao());
-            //tab.colocarPeca(new Peao(tab, Cor.Preta), new PosicaoXadrez('f', 7).conversorPosicao());
-            //tab.colocarPeca(new Peao(tab, Cor.Preta), new PosicaoXadrez('g', 7).conversorPosicao());
-            //tab.colocarPeca(new Peao(tab, Cor.Preta), new PosicaoXadrez('h', 7).conversorPosicao());
-
-
         }
     }
 }
