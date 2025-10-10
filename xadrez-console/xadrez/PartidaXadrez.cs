@@ -49,11 +49,26 @@ namespace xadrez
                 throw new TabuleiroException("Você não pode se colocar em xeque!");
             }
 
-            turno++;
-            mudaJogador();
+            Cor adversario = adversaria(jogadorAtual);
+            bool adversarioEmXeque = reiEmXeque(adversario);
+
+            if (reiEmXeque(adversaria(jogadorAtual)))
+            {
+                if (testeXequeMate(adversaria(jogadorAtual)))
+                {
+                    terminada = true;
+                }
+            }
+
+            if (!terminada)
+            {
+                turno++;
+                mudaJogador();
+            }
+
 
         }
-
+                
         public void validarPosicaoOrigem(Posicao pos)
         {
             if (tab.peca(pos) == null)
@@ -104,6 +119,46 @@ namespace xadrez
             return false;
         }
 
+        public bool testeXequeMate(Cor cor)
+        {
+            if (!reiEmXeque(cor))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < tab.linhas; i++)
+            {
+                for (int j = 0; j < tab.colunas; j++)
+                {
+                    Peca p = tab.peca(i, j);
+                    if (p != null && p.cor == cor)
+                    {
+                        bool[,] mat = p.movimentosPossiveis();
+                        for (int linha = 0; linha < tab.linhas; linha++)
+                        {
+                            for (int coluna = 0; coluna < tab.colunas; coluna++)
+                            {
+                                if (mat[linha, coluna])
+                                {
+                                    Posicao origem = new Posicao(i, j);
+                                    Posicao destino = new Posicao(linha, coluna);
+                                    Peca pecaCapturada = executaMovimento(origem, destino);
+                                    bool aindaEmXeque = reiEmXeque(cor);
+                                    desfazMovimento(origem, destino, pecaCapturada);
+                                    if (!aindaEmXeque)
+                                    {
+                                        return false; 
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return true; 
+        }
+
+
         private Posicao encontrarRei(Cor cor)
         {
             for (int i = 0; i < tab.linhas; i++)
@@ -141,6 +196,11 @@ namespace xadrez
             tab.colocarPeca(new Torre(tab, Cor.Preta), new PosicaoXadrez('a', 8).conversorPosicao());
             tab.colocarPeca(new Torre(tab, Cor.Preta), new PosicaoXadrez('h', 8).conversorPosicao());
             tab.colocarPeca(new Rei(tab, Cor.Preta), new PosicaoXadrez('e', 8).conversorPosicao());
+        }
+
+        private Cor adversaria(Cor cor)
+        {
+            return (cor == Cor.Branca) ? Cor.Preta : Cor.Branca;
         }
     }
 }
